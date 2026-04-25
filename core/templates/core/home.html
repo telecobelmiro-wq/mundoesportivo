@@ -11,16 +11,24 @@
     </div>
 </div>
 
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+    {{ message }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+{% endif %}
+
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2 class="fw-bold">Nossos Produtos:</h2>
-    <span class="badge bg-primary px-3 py-2">Total: {{ produtos|length }} itens</span>
 </div>
 
 <div class="row">
     {% for produto in produtos %}
     <div class="col-md-4 mb-4">
         <div class="card shadow-sm h-100 border-0">
-            <img src="{{ produto.imagem_url }}" class="card-img-top" alt="{{ produto.nome }}"
+            <img src="{% static produto.imagem_url %}" class="card-img-top" alt="{{ produto.nome }}"
                 style="height: 200px; object-fit: cover;">
 
             <div class="card-body">
@@ -28,15 +36,15 @@
                 <h5 class="card-title fw-bold">{{ produto.nome }}</h5>
                 <h4 class="text-primary mt-3 fw-bold">R$ {{ produto.preco }}</h4>
 
-                {% if user.is_authenticated %}
                 <div class="alert alert-info py-1 px-2 mt-2" style="font-size: 0.8rem;">
                     Estoque disponível: <strong>{{ produto.estoque }}</strong>
                 </div>
-                {% endif %}
             </div>
 
             <div class="card-footer bg-transparent border-top-0 pb-3">
-                <button class="btn btn-primary w-100 shadow-sm">Adicionar ao Carrinho</button>
+                <a href="{% url 'finalizar_compra' produto.id %}" class="btn btn-primary w-100 shadow-sm">
+                    Finalizar Compra
+                </a>
             </div>
         </div>
     </div>

@@ -1,57 +1,65 @@
 {% extends 'core/base.html' %}
+{% load static %}
 
 {% block content %}
 <div class="row">
     <div class="col-md-8">
         <h2 class="mb-4">Meu Carrinho</h2>
 
+        {% for item in itens_carrinho %}
         <div class="card mb-3 shadow-sm">
             <div class="card-body">
                 <div class="row align-items-center">
                     <div class="col-md-2">
-                        <img src="https://via.placeholder.com/100" class="img-fluid rounded" alt="Produto">
+                        <img src="{% static item.produto.imagem %}" class="img-fluid rounded"
+                            alt="{{ item.produto.nome }}">
                     </div>
                     <div class="col-md-4">
-                        <h5>Chuteira de Teste</h5>
-                        <p class="text-muted small">Categoria: Calçados</p>
+                        <h5>{{ item.produto.nome }}</h5>
+                        <p class="text-muted small">Categoria: {{ item.produto.categoria.nome }}</p>
                     </div>
                     <div class="col-md-2 text-center">
-                        <input type="number" class="form-control" value="1">
+                        <input type="number" class="form-control" value="1" readonly
+                            style="width: 60px; margin: 0 auto;">
                     </div>
                     <div class="col-md-2 text-end">
-                        <span class="fw-bold">R$ 299,90</span>
+                        <span class="fw-bold">R$ {{ item.produto.preco }}</span>
                     </div>
                     <div class="col-md-2 text-end">
-                        <button class="btn btn-sm btn-outline-danger">Remover</button>
+                        <a href="{% url 'remover_do_carrinho' item.id %}" class="btn btn-sm btn-outline-danger">
+                            Remover
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
+        {% empty %}
+        <div class="text-center py-5">
+            <h4 class="text-muted">Seu carrinho está vazio ainda, meu amigo.</h4>
+            <a href="{% url 'home' %}" class="btn btn-primary mt-3">Voltar para a Loja</a>
+        </div>
+        {% endfor %}
 
-        <a href="/" class="btn btn-link text-decoration-none">← Continuar Comprando</a>
+        <a href="{% url 'home' %}" class="btn btn-link text-decoration-none">← Continuar Comprando</a>
     </div>
 
     <div class="col-md-4">
-        <div class="card shadow-sm bg-light">
-            <div class="card-body">
-                <h4 class="card-title mb-4">Resumo</h4>
-                <div class="d-flex justify-content-between mb-2">
-                    <span>Subtotal</span>
-                    <span>R$ 299,90</span>
-                </div>
-                <div class="d-flex justify-content-between mb-2">
-                    <span>Frete</span>
-                    <span class="text-success">Grátis</span>
-                </div>
-                <hr>
-                <div class="d-flex justify-content-between mb-4">
-                    <strong>Total</strong>
-                    <strong class="h4 text-primary">R$ 299,90</strong>
-                </div>
-                <div class="d-grid gap-2">
-                    <button class="btn btn-success btn-lg">Finalizar Compra</button>
-                </div>
+        <div class="card shadow-sm bg-light p-3">
+            <h4 class="mb-4">Resumo</h4>
+            <div class="d-flex justify-content-between mb-2">
+                <span>Subtotal</span>
+                <span>R$ {{ total_carrinho }}</span>
             </div>
+            <div class="d-flex justify-content-between mb-2">
+                <span>Frete</span>
+                <span class="text-success">Grátis</span>
+            </div>
+            <hr>
+            <div class="d-flex justify-content-between mb-4">
+                <strong>Total</strong>
+                <strong class="h4 text-primary">R$ {{ total_carrinho }}</strong>
+            </div>
+            <button class="btn btn-success btn-lg w-100">Confirmar Pedido</button>
         </div>
     </div>
 </div>
