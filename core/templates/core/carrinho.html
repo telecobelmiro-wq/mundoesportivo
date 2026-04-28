@@ -2,65 +2,109 @@
 {% load static %}
 
 {% block content %}
-<div class="row">
-    <div class="col-md-8">
-        <h2 class="mb-4">Meu Carrinho</h2>
 
-        {% for item in itens_carrinho %}
-        <div class="card mb-3 shadow-sm">
-            <div class="card-body">
-                <div class="row align-items-center">
-                    <div class="col-md-2">
-                        <img src="{% static item.produto.imagem %}" class="img-fluid rounded"
-                            alt="{{ item.produto.nome }}">
-                    </div>
-                    <div class="col-md-4">
-                        <h5>{{ item.produto.nome }}</h5>
-                        <p class="text-muted small">Categoria: {{ item.produto.categoria.nome }}</p>
-                    </div>
-                    <div class="col-md-2 text-center">
-                        <input type="number" class="form-control" value="1" readonly
-                            style="width: 60px; margin: 0 auto;">
-                    </div>
-                    <div class="col-md-2 text-end">
-                        <span class="fw-bold">R$ {{ item.produto.preco }}</span>
-                    </div>
-                    <div class="col-md-2 text-end">
-                        <a href="{% url 'remover_do_carrinho' item.id %}" class="btn btn-sm btn-outline-danger">
-                            Remover
-                        </a>
+<form action="{% url 'finalizar_compra_carrinho' %}" method="POST">
+    {% csrf_token %}
+
+    <div class="row">
+
+        <div class="col-md-8">
+            <h2 class="mb-4">Meu Carrinho</h2>
+
+            {% if messages %}
+            {% for message in messages %}
+            <p class="text-success fw-bold">compra realizada com sucesso!</p>
+            {% endfor %}
+            {% endif %}
+
+            {% for item in itens_carrinho %}
+            <div class="card mb-3 shadow-sm">
+                <div class="card-body">
+                    <div class="row align-items-center">
+
+                        <div class="col-md-2">
+                            <img src="{% static item.produto.imagem_url %}" class="img-fluid rounded">
+                        </div>
+
+                        <input name="produto" value="{{item.produto.id}}"></input>
+
+                        <div class="col-md-4">
+                            <h5>{{ item.produto.nome }}</h5>
+                            <p class="text-muted small">
+                                Categoria: {{ item.produto.categoria.nome }}
+                            </p>
+                        </div>
+
+                        <div class="col-md-2 text-end">
+                            <span class="fw-bold">
+                                R$ {{ item.produto.preco }}
+                            </span>
+
+                            <input type="number" name="quantidade" value="{{ item.quantidade }}" min="1"
+                                class="form-control" style="width: 70px;">
+                        </div>
+
+                        <div class="col-md-2 text-end">
+                            <a href="{% url 'remover_do_carrinho' item.id %}" class="btn btn-sm btn-outline-danger">
+                                Remover
+                            </a>
+                        </div>
+
                     </div>
                 </div>
             </div>
-        </div>
-        {% empty %}
-        <div class="text-center py-5">
-            <h4 class="text-muted">Seu carrinho está vazio ainda, meu amigo.</h4>
-            <a href="{% url 'home' %}" class="btn btn-primary mt-3">Voltar para a Loja</a>
-        </div>
-        {% endfor %}
+            {% empty %}
+            <div class="text-center py-5">
+                <h4 class="text-muted">
+                    Seu carrinho está vazio ainda, meu amigo.
+                </h4>
+                <a href="{% url 'home' %}" class="btn btn-primary mt-3">
+                    Voltar para a Loja
+                </a>
+            </div>
+            {% endfor %}
 
-        <a href="{% url 'home' %}" class="btn btn-link text-decoration-none">← Continuar Comprando</a>
-    </div>
-
-    <div class="col-md-4">
-        <div class="card shadow-sm bg-light p-3">
-            <h4 class="mb-4">Resumo</h4>
-            <div class="d-flex justify-content-between mb-2">
-                <span>Subtotal</span>
-                <span>R$ {{ total_carrinho }}</span>
-            </div>
-            <div class="d-flex justify-content-between mb-2">
-                <span>Frete</span>
-                <span class="text-success">Grátis</span>
-            </div>
-            <hr>
-            <div class="d-flex justify-content-between mb-4">
-                <strong>Total</strong>
-                <strong class="h4 text-primary">R$ {{ total_carrinho }}</strong>
-            </div>
-            <button class="btn btn-success btn-lg w-100">Confirmar Pedido</button>
+            <a href="{% url 'home' %}" class="btn btn-link">
+                ← Continuar Comprando
+            </a>
         </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm bg-light p-3">
+                <h4 class="mb-4">Resumo</h4>
+
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Subtotal</span>
+                    <span>R$ {{ total_carrinho }}</span>
+                </div>
+
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Frete</span>
+                    <span class="text-success">Grátis</span>
+                </div>
+
+                <hr>
+
+                <div class="d-flex justify-content-between mb-4">
+                    <strong>Total</strong>
+                    <strong class="h4 text-primary">
+                        R$ {{ total_carrinho }}
+                    </strong>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Seu Nome:</label>
+                    <input type="text" name="nome_cliente" class="form-control" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100">
+                    Finalizar Pedido
+                </button>
+
+            </div>
+        </div>
+
     </div>
-</div>
+</form>
+
 {% endblock %}

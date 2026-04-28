@@ -14,7 +14,14 @@
 {% if messages %}
 {% for message in messages %}
 <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-    {{ message }}
+    <strong>{{ message }}</strong>
+
+    {% if valor_final %}
+    <div class="mt-2 border-top pt-2" style="border-color: rgba(0,0,0,0.1) !important;">
+        <span>Valor total da sua compra: <strong>R$ {{ valor_final }}</strong></span>
+    </div>
+    {% endif %}
+
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 </div>
 {% endfor %}
@@ -29,7 +36,7 @@
     <div class="col-md-4 mb-4">
         <div class="card shadow-sm h-100 border-0">
             <img src="{% static produto.imagem_url %}" class="card-img-top" alt="{{ produto.nome }}"
-                style="height: 200px; object-fit: cover;">
+                style="height: 200px; object-fit: contain; background-color: #f8f9fa; width: 100%;">
 
             <div class="card-body">
                 <p class="text-uppercase small text-muted mb-1">{{ produto.categoria.nome }}</p>
@@ -41,11 +48,12 @@
                 </div>
             </div>
 
-            <div class="card-footer bg-transparent border-top-0 pb-3">
-                <a href="{% url 'finalizar_compra' produto.id %}" class="btn btn-primary w-100 shadow-sm">
-                    Finalizar Compra
-                </a>
-            </div>
+            <form action="{% url 'finalizar_compra' produto.id %}" method="POST" class="mt-2">
+                {% csrf_token %}
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary w-100">Comprar</button>
+                </div>
+            </form>
         </div>
     </div>
     {% empty %}
