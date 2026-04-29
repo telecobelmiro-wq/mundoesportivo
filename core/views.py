@@ -6,14 +6,16 @@ def home(request):
     produtos = Produto.objects.all()
     valor_final = request.session.pop('total_compra_finalizada', None)
     
+    contagem_carrinho = Pedido.objects.count()
+    
     return render(request, 'core/home.html', {
         'produtos': produtos,
-        'valor_final': valor_final
+        'valor_final': valor_final,
+        'contagem_carrinho': contagem_carrinho 
     })
 
-def finalizar_compra(request, produto_id):
+def finalizar_compra(request, produto_id): 
     produto = get_object_or_404(Produto, id=produto_id)
-
     Pedido.objects.create(produto=produto, quantidade=1)
     return redirect('carrinho')
 
@@ -32,27 +34,23 @@ def remover_do_carrinho(request, pedido_id):
 
 def finalizar_carrinho(request):
     if request.method == 'POST':
-        nome = request.POST.get('nome_cliente')
-        nome = request.POST.get('Produto')
-        itens_no_carrinho = Pedido.objects.all()
+        nome_cliente = request.POST.get('nome_cliente')
+        itens = Pedido.objects.all()
+        total_venda = 0
+        
+        for item in itens:
 
-        if not itens_no_carrinho.exists():
-            return redirect('home')
-        
-        # for item in itens_no_carrinho: 
-        print(itens_no_carrinho.produto.preco)
-        print(itens_no_carrinho.quantidade)
-        
-        total_venda = sum(itens_no_carrinho.produto.preco * itens_no_carrinho.quantidade)
-        
+            qtd_form = request.POST.get(f'quantidade_{item.id}')
+            
+            if qtd_form:
+                item.quantidade = int(qtd_form)
+                item.save()
+            
+            total_venda += (item.produto.preco * item.quantidade)
+            item.produto.estoque -= item.quantidade
+            item.produto.save()
+
         request.session['total_compra_finalizada'] = f"{total_venda:.2f}"
-
-        for item in itens_no_carrinho:
-            produto = Produto.Objects.get(itens_no_carrinho.produto)
-            produto.estoque -= item.quantidade 
-            produto.save()
-
-        Pedido.objects.all().delete()
-        
-        messages.success(request, f"Compra realizada com sucesso irmão, {nome}!") 
+        itens.delete()
+        messages.success(request, f"Compra finalizada com sucesso, {nome_cliente}!")
         return redirect('home')

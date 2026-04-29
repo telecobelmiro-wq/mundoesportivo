@@ -7,13 +7,12 @@
     {% csrf_token %}
 
     <div class="row">
-
         <div class="col-md-8">
             <h2 class="mb-4">Meu Carrinho</h2>
 
             {% if messages %}
             {% for message in messages %}
-            <p class="text-success fw-bold">compra realizada com sucesso!</p>
+            <p class="text-success fw-bold">Compra realizada com sucesso meu amigão!</p>
             {% endfor %}
             {% endif %}
 
@@ -26,7 +25,7 @@
                             <img src="{% static item.produto.imagem_url %}" class="img-fluid rounded">
                         </div>
 
-                        <input name="produto" value="{{item.produto.id}}"></input>
+                        <input type="hidden" name="produto_id" value="{{ item.produto.id }}">
 
                         <div class="col-md-4">
                             <h5>{{ item.produto.nome }}</h5>
@@ -35,16 +34,19 @@
                             </p>
                         </div>
 
-                        <div class="col-md-2 text-end">
-                            <span class="fw-bold">
+                        <div class="col-md-3 text-end">
+                            <span class="fw-bold d-block mb-2">
                                 R$ {{ item.produto.preco }}
                             </span>
 
-                            <input type="number" name="quantidade" value="{{ item.quantidade }}" min="1"
-                                class="form-control" style="width: 70px;">
+                            <div class="d-flex align-items-center justify-content-end">
+                                <label class="me-2 small">Qtd:</label>
+                                <input type="number" name="quantidade_{{ item.id }}" value="{{ item.quantidade }}"
+                                    min="1" class="form-control" style="width: 70px;">
+                            </div>
                         </div>
 
-                        <div class="col-md-2 text-end">
+                        <div class="col-md-3 text-end">
                             <a href="{% url 'remover_do_carrinho' item.id %}" class="btn btn-sm btn-outline-danger">
                                 Remover
                             </a>
@@ -94,10 +96,10 @@
 
                 <div class="mb-3">
                     <label class="form-label fw-bold">Seu Nome:</label>
-                    <input type="text" name="nome_cliente" class="form-control" required>
+                    <input type="text" name="nome_cliente" class="form-control" required placeholder="Digite seu nome">
                 </div>
 
-                <button type="submit" class="btn btn-primary w-100">
+                <button type="submit" class="btn btn-primary w-100 fw-bold">
                     Finalizar Pedido
                 </button>
 
