@@ -16,11 +16,11 @@ def home(request):
 
 def finalizar_compra(request, produto_id): 
     produto = get_object_or_404(Produto, id=produto_id)
-    Pedido.objects.create(produto=produto, quantidade=1)
+    Pedido.objects.create(produto=produto, quantidade=1,finalizado = False)
     return redirect('carrinho')
 
 def carrinho(request):
-    itens = Pedido.objects.all()
+    itens = Pedido.objects.filter(finalizado = False)
     total = sum(item.produto.preco * item.quantidade for item in itens)
     return render(request, 'core/carrinho.html', {
         'itens_carrinho': itens,
@@ -35,15 +35,17 @@ def remover_do_carrinho(request, pedido_id):
 def finalizar_carrinho(request):
     if request.method == 'POST':
         nome_cliente = request.POST.get('nome_cliente')
-        itens = Pedido.objects.all()
+        itens = Pedido.objects.filter(finalizado = False)
         total_venda = 0
-        
+         
         for item in itens:
 
             qtd_form = request.POST.get(f'quantidade_{item.id}')
             
             if qtd_form:
+                item.usuario = nome_cliente
                 item.quantidade = int(qtd_form)
+                item.finalizado = True
                 item.save()
             
             total_venda += (item.produto.preco * item.quantidade)
@@ -51,6 +53,5 @@ def finalizar_carrinho(request):
             item.produto.save()
 
         request.session['total_compra_finalizada'] = f"{total_venda:.2f}"
-        itens.delete()
         messages.success(request, f"Compra finalizada com sucesso, {nome_cliente}!")
         return redirect('home')

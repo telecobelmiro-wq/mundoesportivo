@@ -15,7 +15,9 @@ class Produto(models.Model):
     estoque = models.IntegerField(default=0)
 
 class Pedido(models.Model):
-    usuario = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    usuario = models.CharField(max_length=100, null=True, blank=True)
     produto = models.ForeignKey(Produto, on_delete=models.CASCADE)
     data_compra = models.DateTimeField(auto_now_add=True)
     quantidade = models.IntegerField(default=1)
+    finalizado = models.BooleanField(default=False)
+    nome_cliente = models.CharField(max_length=100, null=True, blank=True)
