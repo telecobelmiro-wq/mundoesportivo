@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="bg-dark text-white p-5 rounded-4 mb-5 text-center shadow">
+        <h1 class="display-4 fw-bold">Mundo Esportivo</h1>
+        <p class="lead">Os melhores equipamentos para o seu desempenho.</p>
+    </div>
+
+    <div class="mb-4">
+        <h5 class="text-muted mb-3"><i class="bi bi-filter"></i> Filtrar por:</h5>
+        <div class="d-flex flex-wrap gap-2">
+            <a href="{% url 'lista_produtos' %}"
+                class="btn {% if not categoria_ativa %}btn-primary{% else %}btn-outline-primary{% endif %} rounded-pill shadow-sm">
+                Todos os Produtos
+            </a>
+
+            {% for cat in categorias %}
+            <a href="{% url 'lista_produtos' %}?categoria={{ cat.id }}"
+                class="btn {% if categoria_ativa == cat.id|stringformat:'s' %}btn-primary{% else %}btn-outline-primary{% endif %} rounded-pill shadow-sm">
+                {{ cat.nome }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <hr class="mb-5">
+
+    <div class="row">
+        {% for produto in produtos %}
+        <div class="col-md-4 col-sm-6 mb-4">
+            <div class="card h-100 border-0 shadow-sm hover-shadow transition">
+                {% if produto.imagem_url %}
+                <img src="{% static produto.imagem_url %}" class="card-img-top p-3" alt="{{ produto.nome }}"
+                    style="height: 250px; object-fit: contain;">
+                {% else %}
+                <img src="https://via.placeholder.com/250" class="card-img-top p-3" alt="Sem imagem">
+                {% endif %}
+
+                <div class="card-body d-flex flex-column">
+                    <span class="badge bg-light text-primary mb-2 align-self-start">{{ produto.categoria.nome }}</span>
+                    <h5 class="card-title fw-bold text-dark">{{ produto.nome }}</h5>
+                    <h4 class="text-success fw-bold">R$ {{ produto.preco }}</h4>
+
+                    <p class="text-muted small mt-auto">
+                        <i class="bi bi-box-seam"></i> Estoque: {{ produto.estoque }} unidades
+                    </p>
+
+                    <form action="{% url 'finalizar_compra' produto.id %}" method="POST" class="mt-3">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary w-100 fw-bold">
+                            <i class="bi bi-cart-plus"></i> Comprar Agora
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5">
+            <div class="p-5 bg-light rounded-4 border border-dashed">
+                <h3 class="text-muted">Nenhum produto encontrado.</h3>
+                <p>No momento não temos itens com estoque disponível nesta categoria.</p>
+                <a href="{% url 'lista_produtos' %}" class="btn btn-link">Ver todos os produtos</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    .hover-shadow:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    .transition {
+        transition: all 0.3s ease;
+    }
+</style>
+{% endblock %}
