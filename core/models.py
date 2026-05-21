@@ -21,3 +21,22 @@ class Pedido(models.Model):
     finalizado = models.BooleanField(default=False)
     nome_cliente = models.CharField(max_length=100, null=True, blank=True)
 
+
+class Livro(models.Model):
+    titulo = models.CharField(max_length=255)
+    autor = models.CharField(max_length=255)
+    ano = models.IntegerField()
+
+    def __str__(self):
+        return f"{self.titulo} - {self.autor}"
+
+class Emprestimo(models.Model):
+    livro = models.ForeignKey(Livro, on_delete=models.CASCADE, related_name='emprestimos')
+    pessoa = models.CharField(max_length=255)
+    data = models.DateField(auto_now_add=True)
+    devolvido = models.BooleanField(default=False)
+
+    def __str__(self):
+        status = "Devolvido" if self.devolvido else "Não Devolvido"
+        return f"{self.pessoa} - {self.livro.titulo} ({status})"
+
